@@ -99,18 +99,16 @@ export function ControlDetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
-        <div className="p-6">
-          <SheetHeader className="space-y-3">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-primary">{item.id}</p>
-              <SheetTitle className="text-xl leading-tight">
-                {item.titleKo}
-              </SheetTitle>
-            </div>
+        <div className="px-6 pt-6">
+          <SheetHeader className="space-y-1 text-left">
+            <p className="text-sm font-medium text-primary">{item.id}</p>
+            <SheetTitle className="text-xl leading-tight text-left">
+              {item.titleKo}
+            </SheetTitle>
           </SheetHeader>
         </div>
 
-        <div className="px-6 pb-6 space-y-6">
+        <div className="px-6 py-6 space-y-6">
           {/* Progress */}
           {status === "in_progress" && (
             <>
@@ -141,9 +139,30 @@ export function ControlDetailSheet({
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-foreground">따라하기</h3>
                 <div className="rounded-lg bg-primary/5 border border-primary/20 p-4">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    {tip}
-                  </p>
+                  <div className="space-y-3 text-sm text-foreground">
+                    {tip.split('\n').map((line, index) => {
+                      const trimmedLine = line.trim();
+                      if (!trimmedLine) return null;
+
+                      // Check if line starts with a number (e.g., "1.", "2.")
+                      const isMainStep = /^\d+\./.test(trimmedLine);
+                      // Check if line starts with dash or bullet
+                      const isSubItem = /^[-•]/.test(trimmedLine) || trimmedLine.startsWith('   -');
+
+                      return (
+                        <p
+                          key={index}
+                          className={cn(
+                            "leading-relaxed",
+                            isMainStep && "font-medium",
+                            isSubItem && "pl-4 text-muted-foreground"
+                          )}
+                        >
+                          {trimmedLine}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
               <Separator />

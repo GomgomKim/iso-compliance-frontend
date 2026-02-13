@@ -523,9 +523,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.7",
     categoryKo: "물리적 통제",
     title: "Physical security perimeters",
-    titleKo: "물리적 보안 경계",
+    titleKo: "사무실 출입 통제 및 방문객 관리",
     description: "Security perimeters shall be defined and used to protect areas that contain information and other associated assets.",
-    descriptionKo: "정보 및 관련 자산이 포함된 영역을 보호하기 위해 보안 경계를 정의하고 사용해야 한다.",
+    descriptionKo: "우리 사무실에 아무나 들어오지 못하게 막고, 누가 들어왔는지 기록을 남기는 절차입니다.",
+    tip: "1. 출입 기록 확보:\n- 공유오피스의 경우 커뮤니티 매니저에게 메일을 보내 '심사 증빙용으로 지난달 직원들의 출입 태깅 로그(Excel)를 받을 수 있을까요?'라고 요청하여 파일을 받습니다.\n2. 방문객 관리대장 비치:\n- 사무실 입구(또는 안내데스크)에 [방문객 출입 관리대장] 노트나 태블릿을 둡니다.\n- 필수 기재 항목: 날짜 / 방문자 성명 / 소속 / 방문 목적 / 접견인(우리 직원) / 입실 시간 / 퇴실 시간\n3. 증적 저장:\n- 출입통제로그.xlsx (받은 파일)\n- 방문객_관리대장_사진.jpg (실제 비치된 모습 촬영)",
+    evidence: "출입 태깅 로그 엑셀 파일, 방문객 관리대장 비치 사진",
   },
   {
     id: "A.7.2",
