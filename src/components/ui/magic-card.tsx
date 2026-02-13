@@ -13,6 +13,7 @@ interface MagicCardProps {
   gradientOpacity?: number
   gradientFrom?: string
   gradientTo?: string
+  onClick?: () => void
 }
 
 export function MagicCard({
@@ -23,6 +24,7 @@ export function MagicCard({
   gradientOpacity = 0.8,
   gradientFrom = "#9E7AFF",
   gradientTo = "#FE8BBB",
+  onClick,
 }: MagicCardProps) {
   const mouseX = useMotionValue(-gradientSize)
   const mouseY = useMotionValue(-gradientSize)
@@ -74,6 +76,7 @@ export function MagicCard({
       onPointerMove={handlePointerMove}
       onPointerLeave={reset}
       onPointerEnter={reset}
+      onClick={onClick}
     >
       <motion.div
         className="bg-border pointer-events-none absolute inset-0 rounded-[inherit] duration-300 group-hover:opacity-100"

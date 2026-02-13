@@ -196,3 +196,12 @@
   background-clip: text;
   color: transparent;
 }
+
+/* Global interactive elements */
+button,
+[role="button"],
+a,
+[data-clickable="true"],
+.cursor-pointer {
+  cursor: pointer;
+}
