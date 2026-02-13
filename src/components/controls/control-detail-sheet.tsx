@@ -99,16 +99,16 @@ export function ControlDetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
-        <div className="px-6 pt-6">
-          <SheetHeader className="space-y-1 text-left">
+        <div className="px-6 pt-6 pb-2">
+          <SheetHeader className="space-y-1 text-left p-0">
             <p className="text-sm font-medium text-primary">{item.id}</p>
-            <SheetTitle className="text-xl leading-tight text-left">
+            <SheetTitle className="text-xl leading-tight text-left p-0">
               {item.titleKo}
             </SheetTitle>
           </SheetHeader>
         </div>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-6 pb-6 space-y-6">
           {/* Progress */}
           {status === "in_progress" && (
             <>
