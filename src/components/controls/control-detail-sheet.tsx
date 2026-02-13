@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -92,15 +94,30 @@ export function ControlDetailSheet({
     }
   };
 
+  const router = useRouter();
+
   // Get tip and evidence from clause or control
   const tip = clause?.tip || (control as AnnexAControl & { tip?: string })?.tip;
   const evidence = clause?.evidence || (control as AnnexAControl & { evidence?: string })?.evidence;
 
+  const handleFullView = () => {
+    onOpenChange(false);
+    router.push(`/controls/${encodeURIComponent(item.id)}`);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleFullView}
+          className="absolute right-12 top-4 h-8 w-8 rounded-sm opacity-70 ring-offset-background transition-all hover:opacity-100 hover:bg-accent"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </Button>
         <div className="px-6 pt-6 pb-2">
-          <SheetHeader className="space-y-1 text-left p-0">
+          <SheetHeader className="space-y-1 text-left p-0 pr-16">
             <p className="text-sm font-medium text-primary">{item.id}</p>
             <SheetTitle className="text-xl leading-tight text-left p-0">
               {item.titleKo}
