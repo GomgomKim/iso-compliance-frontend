@@ -20,12 +20,6 @@ export interface ControlWithStatus extends AnnexAControl {
 }
 
 export const controlCategories = [
-  // ISO 27001 Main body clauses
-  { id: "4", name: "Context of the organization", nameKo: "조직의 상황", count: 1 },
-  { id: "5", name: "Leadership", nameKo: "리더십", count: 1 },
-  { id: "6", name: "Planning", nameKo: "기획", count: 1 },
-  { id: "7", name: "Support", nameKo: "지원", count: 2 },
-  // ISO 27001 Annex A controls
   { id: "A.5", name: "Organizational controls", nameKo: "조직적 통제", count: 37 },
   { id: "A.6", name: "People controls", nameKo: "인적 통제", count: 8 },
   { id: "A.7", name: "Physical controls", nameKo: "물리적 통제", count: 14 },
@@ -33,69 +27,6 @@ export const controlCategories = [
 ];
 
 export const annexAControls: AnnexAControl[] = [
-  // 4. Context of the organization
-  {
-    id: "4.1",
-    category: "4",
-    categoryKo: "조직의 상황",
-    title: "Understanding the organization and its context",
-    titleKo: "이해관계자 및 보안 요구사항 식별서",
-    description: "The organization shall determine external and internal issues that are relevant to its purpose and that affect its ability to achieve the intended outcome(s) of its information security management system.",
-    descriptionKo: "고객, 정부, 임직원, 주주가 우리 회사 보안에 대해 무엇을 요구하는지 정리한 표입니다.",
-    tip: "1. 표 만들기: 노션이나 엑셀에 아래 컬럼으로 표를 만듭니다.\n   - 구분: 고객 / 정부 / 임직원 / 주주\n   - 이해관계자: (예: B2B 고객사, KISA, 개인정보보호위원회, 직원 전체)\n   - 요구사항: (예: '서비스 중단 없는 안정성(SLA)', '개인정보보호법 준수', '연봉 정보 비밀 유지')\n   - 관련 문서: (예: 서비스 이용약관, 취업규칙)\n2. 내용 채우기: 위 예시를 참고하여 3~4줄 정도만 채워 넣습니다.\n3. 증적 저장: 작성된 표를 PDF로 내보내기 하여 저장 (4.1_이해관계자_요구사항.pdf)",
-    evidence: "이해관계자 요구사항 표 PDF",
-  },
-
-  // 5. Leadership
-  {
-    id: "5.2",
-    category: "5",
-    categoryKo: "리더십",
-    title: "Policy",
-    titleKo: "정보보호 정책서",
-    description: "Top management shall establish an information security policy that is appropriate to the purpose of the organization.",
-    descriptionKo: "회사의 정보보호 방침과 원칙을 문서화한 최상위 정책 문서입니다.",
-    tip: "1. 정책서 작성: 노션에 '정보보호 정책서' 페이지를 만들고 다음 내용을 포함합니다.\n   - 정보보호 목표 및 원칙\n   - 적용 범위 (전 임직원, 시스템 등)\n   - 경영진 의지 표명\n2. 네트워크 구성도 작성: AWS VPC 안에 Web Server, WAS, DB 등을 그리고, 전체를 감싸는 점선 박스에 'ISMS 인증 범위'라고 표시합니다.\n3. 증적 저장: 정책서 PDF 및 범위가 표시된 네트워크 구성도 이미지",
-    evidence: "정보보호 정책서 PDF, ISMS 인증 범위 네트워크 구성도",
-  },
-
-  // 6. Planning
-  {
-    id: "6.1",
-    category: "6",
-    categoryKo: "기획",
-    title: "Actions to address risks and opportunities",
-    titleKo: "정보보호 위험 평가표",
-    description: "When planning for the information security management system, the organization shall consider the issues and determine the risks and opportunities that need to be addressed.",
-    descriptionKo: "우리 회사의 자산(노트북, 서버)이 털렸을 때 얼마나 위험한지 점수(Risk Score)를 매기는 과정입니다.",
-    tip: "1. 엑셀 표 작성:\n   - 자산명: 대표이사 노트북 / AWS 운영 DB / 개발자 노트북\n   - 위협: 분실 / 해킹 / 파손\n   - 가능성(A): 1(낮음) ~ 3(높음)\n   - 피해규모(B): 1(낮음) ~ 3(높음)\n   - 위험도(A x B): 1 ~ 9점\n2. 평가: 예를 들어 'AWS 운영 DB'가 '해킹'당하면 피해가 크므로(3), 가능성이 낮아도(1) 위험도는 3점입니다.\n3. DOA 설정: '위험도 6점 이상은 무조건 조치한다'는 기준(수용 가능 위험 수준)을 정해둡니다.\n4. 증적 저장: 작성된 위험 평가 엑셀 파일",
-    evidence: "위험 평가표 엑셀 파일",
-  },
-
-  // 7. Support
-  {
-    id: "7.2",
-    category: "7",
-    categoryKo: "지원",
-    title: "Competence",
-    titleKo: "정보보호 자원 및 예산 할당 내역",
-    description: "The organization shall determine the necessary competence of person(s) doing work under its control that affects its information security performance.",
-    descriptionKo: "'보안 하라고 말만 하지 않고, 돈(예산)과 사람을 썼다'는 것을 증명합니다.",
-    tip: "1. 예산 내역 정리: 보안 관련 지출 내역을 정리합니다.\n   - 보안 소프트웨어 구매비 (백신, 방화벽 등)\n   - 보안 교육비\n   - 외부 컨설팅비\n2. 인력 현황: 보안 업무 담당 인원 및 역할을 문서화합니다.\n3. 증적 저장: 예산 집행 내역서, 조직도 또는 R&R 문서",
-    evidence: "보안 예산 집행 내역서, 보안 인력 R&R 문서",
-  },
-  {
-    id: "7.3",
-    category: "7",
-    categoryKo: "지원",
-    title: "Awareness",
-    titleKo: "정기 정보보호 교육 결과",
-    description: "Persons doing work under the organization's control shall be aware of the information security policy and their contribution to the effectiveness of the ISMS.",
-    descriptionKo: "전 직원이 1년에 1회 이상 보안 교육을 듣고, 퀴즈를 풀어 내용을 숙지했음을 증명합니다.",
-    tip: "1. 교육 실시: 개인정보보호포털 등의 무료 온라인 교육 링크를 슬랙에 배포하고 '이번 주까지 들으세요' 공지합니다.\n2. 퀴즈 및 서명: 구글 폼(Google Forms)을 만들어 배포합니다.\n   - 내용: 이름, 부서, 교육 이수 여부(O/X), 간단한 OX 퀴즈 5문제, 서명(이름 입력)\n3. 결과 보관: 구글 폼 응답 결과(스프레드시트)를 PDF로 변환하여 저장합니다. (누가 언제 냈는지 타임스탬프가 찍혀 있어야 함)\n4. 증적 저장: 연도_전사_보안교육_결과보고서.pdf",
-    evidence: "보안교육 결과보고서 PDF, 구글 폼 응답 스프레드시트",
-  },
-
   // A.5 Organizational controls (37)
   {
     id: "A.5.1",

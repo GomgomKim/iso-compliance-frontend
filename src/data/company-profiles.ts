@@ -18,7 +18,7 @@ export const companyProfiles: Record<CompanySize, CompanyProfile> = {
     description: "Essential controls for startups and small teams",
     descriptionKo: "스타트업 및 소규모 팀을 위한 필수 통제항목",
     managementClauses: [
-      "4.1", "4.3", "5.2", "6.1", "7.2", "7.3"
+      "4.1", "4.3", "5.2", "6.1", "7.1", "7.2", "7.3"
     ],
     annexAControls: [
       // 조직적 통제
