@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useState } from "react";
+import { SettingsProvider } from "@/contexts/settings-context";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -41,7 +42,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <SettingsProvider>
+        {children}
+      </SettingsProvider>
       <Toaster
         position="bottom-right"
         toastOptions={{

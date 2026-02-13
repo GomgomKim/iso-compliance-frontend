@@ -25,7 +25,8 @@ import {
 } from "@/data/annex-a-controls";
 import { managementClauses, clauseCategories, type ManagementClause } from "@/data/management-system";
 import { ControlDetailSheet } from "@/components/controls/control-detail-sheet";
-import { companyProfiles, companySizeOptions, type CompanySize } from "@/data/company-profiles";
+import { companyProfiles } from "@/data/company-profiles";
+import { useSettings } from "@/contexts/settings-context";
 import type { Task } from "@/data/tasks";
 
 type FilterStatus = "all" | ControlStatus;
@@ -189,51 +190,14 @@ function CategoryStats({ items, getStatus, type }: CategoryStatsProps) {
   );
 }
 
-function CompanyScopeSelector({
-  value,
-  onChange
-}: {
-  value: CompanySize;
-  onChange: (size: CompanySize) => void;
-}) {
-  const currentProfile = companyProfiles[value];
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          {currentProfile.nameKo}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {companySizeOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              "cursor-pointer",
-              value === option.value && "bg-accent"
-            )}
-          >
-            {option.label}
-            <span className="ml-2 text-xs text-muted-foreground">
-              ({companyProfiles[option.value].annexAControls.length + companyProfiles[option.value].managementClauses.length}개)
-            </span>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 export default function ControlsPage() {
+  const { companySize } = useSettings();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
   const [selectedItem, setSelectedItem] = useState<ControlItem | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [controlStatuses, setControlStatuses] = useState<Record<string, { status: ControlStatus; progress: number }>>({});
-  const [companySize, setCompanySize] = useState<CompanySize>("startup");
   const [controlType, setControlType] = useState<"all" | "annex-a" | "clause">("all");
 
   // File upload state (per control)
@@ -387,12 +351,7 @@ export default function ControlsPage() {
       <AppSidebar />
 
       <main className="ml-64 h-screen flex flex-col">
-        <AppHeader
-          title="컨트롤"
-          actions={
-            <CompanyScopeSelector value={companySize} onChange={setCompanySize} />
-          }
-        />
+        <AppHeader title="컨트롤" />
 
         <div className="flex-1 overflow-hidden flex flex-col p-8 space-y-6">
           {/* Type Toggle */}
@@ -517,8 +476,8 @@ export default function ControlsPage() {
           </p>
 
           {/* Controls Grid - Scrollable */}
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+          <div className="flex-1 overflow-y-auto min-h-0 -mx-2 px-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 py-2 pb-4">
               {filteredItems.map((item) => {
                 const { status, progress } = getControlStatusLocal(item.id);
                 return (

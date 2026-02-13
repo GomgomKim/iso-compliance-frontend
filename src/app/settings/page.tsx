@@ -16,7 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { companyProfiles, companySizeOptions, type CompanySize } from "@/data/company-profiles";
+import { companyProfiles, companySizeOptions } from "@/data/company-profiles";
+import { useSettings } from "@/contexts/settings-context";
 
 interface UserProfile {
   name: string;
@@ -33,8 +34,7 @@ interface NotificationSettings {
 }
 
 export default function SettingsPage() {
-  const [companySize, setCompanySize] = useState<CompanySize>("startup");
-  const [companyName, setCompanyName] = useState("내 회사");
+  const { companySize, setCompanySize, companyName, setCompanyName } = useSettings();
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: "홍길동",
     email: "admin@company.com",

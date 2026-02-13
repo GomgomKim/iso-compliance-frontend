@@ -192,7 +192,7 @@ function BoardColumn({ status, tasks, onStatusChange, onTaskClick }: BoardColumn
         <h3 className="text-sm font-medium">{statusInfo.labelKo}</h3>
         <span className="text-xs text-muted-foreground">({tasks.length})</span>
       </div>
-      <div className="flex-1 space-y-3 overflow-y-auto">
+      <div className="flex-1 space-y-3 overflow-y-auto px-1 pt-1 pb-2">
         {tasks.map((task) => (
           <TaskCard
             key={task.id}
@@ -282,9 +282,31 @@ export default function TasksPage() {
       <AppSidebar />
 
       <main className="ml-64 h-screen flex flex-col">
-        <AppHeader
-          title="태스크"
-          actions={
+        <AppHeader title="태스크" />
+
+        <div className="flex-1 overflow-hidden flex flex-col p-8 space-y-6">
+          {/* Stats + View Toggle */}
+          <div className="flex items-center justify-between shrink-0">
+            <div className="flex gap-6">
+              <div>
+                <p className="text-xs text-muted-foreground">전체</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">완료</p>
+                <p className="text-2xl font-bold text-green-400">{stats.completed}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">진행 중</p>
+                <p className="text-2xl font-bold text-blue-400">{stats.inProgress}</p>
+              </div>
+              {stats.overdue > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground">지연</p>
+                  <p className="text-2xl font-bold text-red-400">{stats.overdue}</p>
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant={viewMode === "board" ? "secondary" : "ghost"}
@@ -301,30 +323,6 @@ export default function TasksPage() {
                 리스트
               </Button>
             </div>
-          }
-        />
-
-        <div className="flex-1 overflow-hidden flex flex-col p-8 space-y-6">
-          {/* Stats */}
-          <div className="flex gap-6 shrink-0">
-            <div>
-              <p className="text-xs text-muted-foreground">전체</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">완료</p>
-              <p className="text-2xl font-bold text-green-400">{stats.completed}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">진행 중</p>
-              <p className="text-2xl font-bold text-blue-400">{stats.inProgress}</p>
-            </div>
-            {stats.overdue > 0 && (
-              <div>
-                <p className="text-xs text-muted-foreground">지연</p>
-                <p className="text-2xl font-bold text-red-400">{stats.overdue}</p>
-              </div>
-            )}
           </div>
 
           {/* Filters */}
@@ -385,8 +383,8 @@ export default function TasksPage() {
 
           {/* Content */}
           {viewMode === "board" ? (
-            <div className="flex-1 overflow-x-auto min-h-0">
-              <div className="flex gap-6 h-full pb-4">
+            <div className="flex-1 overflow-x-auto min-h-0 -mx-2 px-2">
+              <div className="flex gap-6 h-full py-2 pb-4">
                 {(Object.keys(taskStatusConfig) as TaskStatus[]).map((status) => (
                   <BoardColumn
                     key={status}
@@ -399,8 +397,8 @@ export default function TasksPage() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <div className="space-y-3 pb-4">
+            <div className="flex-1 overflow-y-auto min-h-0 -mx-2 px-2">
+              <div className="space-y-3 pt-1 pb-4 px-1">
                 {filteredTasks.map((task) => (
                   <TaskCard
                     key={task.id}

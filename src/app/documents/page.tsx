@@ -8,79 +8,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-type FileCategory = "all" | "policy" | "evidence" | "report" | "other";
-
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  uploadedAt: string;
-  category: FileCategory;
-  controlId?: string;
-  description?: string;
-}
-
-const fileCategoryConfig: Record<FileCategory, { label: string; color: string }> = {
-  all: { label: "전체", color: "bg-muted text-muted-foreground" },
-  policy: { label: "정책/지침", color: "bg-blue-500/20 text-blue-400" },
-  evidence: { label: "증빙자료", color: "bg-green-500/20 text-green-400" },
-  report: { label: "보고서", color: "bg-purple-500/20 text-purple-400" },
-  other: { label: "기타", color: "bg-zinc-500/20 text-zinc-400" },
-};
-
-// Sample documents for demonstration
-const sampleDocuments: UploadedFile[] = [
-  {
-    id: "doc-1",
-    name: "정보보호 정책서 v2.1.pdf",
-    size: 2456000,
-    uploadedAt: "2026-02-10",
-    category: "policy",
-    controlId: "A.5.1",
-    description: "CEO 서명 포함 정보보호 정책",
-  },
-  {
-    id: "doc-2",
-    name: "위험평가표_2026.xlsx",
-    size: 156000,
-    uploadedAt: "2026-02-08",
-    category: "evidence",
-    controlId: "6.1",
-    description: "연간 위험 평가 결과",
-  },
-  {
-    id: "doc-3",
-    name: "보안교육_이수현황.pdf",
-    size: 890000,
-    uploadedAt: "2026-02-05",
-    category: "evidence",
-    controlId: "A.6.3",
-  },
-  {
-    id: "doc-4",
-    name: "내부심사_보고서_2026Q1.docx",
-    size: 1234000,
-    uploadedAt: "2026-02-01",
-    category: "report",
-    controlId: "9.2",
-  },
-  {
-    id: "doc-5",
-    name: "접근권한_검토결과.xlsx",
-    size: 234000,
-    uploadedAt: "2026-01-28",
-    category: "evidence",
-    controlId: "A.5.15",
-  },
-];
+import { toast } from "sonner";
+import {
+  useDocuments,
+  useDirectUpload,
+  useDeleteDocument,
+  useDownloadUrl,
+  type Document,
+} from "@/hooks/use-documents";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + " B";
@@ -116,18 +52,20 @@ function getFileTypeColor(filename: string): string {
 }
 
 interface DocumentCardProps {
-  file: UploadedFile;
+  file: Document;
   onDelete: (id: string) => void;
-  onCategoryChange: (id: string, category: FileCategory) => void;
+  onDownload: (id: string) => void;
+  isDeleting?: boolean;
 }
 
-function DocumentCard({ file, onDelete, onCategoryChange }: DocumentCardProps) {
+function DocumentCard({ file, onDelete, onDownload, isDeleting }: DocumentCardProps) {
   return (
     <MagicCard
-      className="rounded-xl"
+      className="rounded-xl cursor-pointer"
       gradientFrom="#8b5cf6"
       gradientTo="#5e5ce6"
       gradientColor="#1c1c1f"
+      onClick={() => onDownload(file.id)}
     >
       <Card className="border-0 bg-transparent shadow-none">
         <CardContent className="p-4">
@@ -147,41 +85,17 @@ function DocumentCard({ file, onDelete, onCategoryChange }: DocumentCardProps) {
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Badge
-                      variant="secondary"
-                      className={cn("cursor-pointer hover:opacity-80", fileCategoryConfig[file.category].color)}
-                    >
-                      {fileCategoryConfig[file.category].label}
-                    </Badge>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {(Object.keys(fileCategoryConfig) as FileCategory[])
-                      .filter((c) => c !== "all")
-                      .map((cat) => (
-                        <DropdownMenuItem
-                          key={cat}
-                          onClick={() => onCategoryChange(file.id, cat)}
-                          className="cursor-pointer"
-                        >
-                          {fileCategoryConfig[cat].label}
-                        </DropdownMenuItem>
-                      ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {file.controlId && (
+                {file.control_id && (
                   <Badge variant="outline" className="text-xs text-primary">
-                    {file.controlId}
+                    {file.control_id}
                   </Badge>
                 )}
 
                 <span className="text-xs text-muted-foreground">
-                  {formatFileSize(file.size)}
+                  {formatFileSize(file.file_size)}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {file.uploadedAt}
+                  {new Date(file.created_at).toLocaleDateString("ko-KR")}
                 </span>
               </div>
             </div>
@@ -190,10 +104,14 @@ function DocumentCard({ file, onDelete, onCategoryChange }: DocumentCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onDelete(file.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(file.id);
+              }}
+              disabled={isDeleting}
               className="shrink-0 text-muted-foreground hover:text-destructive"
             >
-              삭제
+              {isDeleting ? "삭제 중..." : "삭제"}
             </Button>
           </div>
         </CardContent>
@@ -203,75 +121,85 @@ function DocumentCard({ file, onDelete, onCategoryChange }: DocumentCardProps) {
 }
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<UploadedFile[]>(sampleDocuments);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<FileCategory>("all");
-  const [uploadCategory, setUploadCategory] = useState<FileCategory>("evidence");
+  const [controlFilter, setControlFilter] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // API hooks
+  const { data: documents = [], isLoading, error } = useDocuments({
+    controlId: controlFilter || undefined,
+    search: searchQuery || undefined,
+  });
+  const uploadMutation = useDirectUpload();
+  const deleteMutation = useDeleteDocument();
+  const downloadMutation = useDownloadUrl();
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const newFiles: UploadedFile[] = Array.from(files).map((file, index) => ({
-        id: `doc-${Date.now()}-${index}`,
-        name: file.name,
-        size: file.size,
-        uploadedAt: new Date().toLocaleDateString("ko-KR"),
-        category: uploadCategory,
-      }));
-      setDocuments((prev) => [...newFiles, ...prev]);
+      for (const file of Array.from(files)) {
+        try {
+          await uploadMutation.mutateAsync({ file });
+          toast.success(`${file.name} 업로드 완료`);
+        } catch {
+          toast.error(`${file.name} 업로드 실패`);
+        }
+      }
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const handleDelete = (id: string) => {
-    setDocuments((prev) => prev.filter((d) => d.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success("문서가 삭제되었습니다");
+    } catch {
+      toast.error("문서 삭제에 실패했습니다");
+    }
   };
 
-  const handleCategoryChange = (id: string, category: FileCategory) => {
-    setDocuments((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, category } : d))
-    );
+  const handleDownload = async (id: string) => {
+    try {
+      const downloadUrl = await downloadMutation.mutateAsync(id);
+      window.open(downloadUrl, "_blank");
+    } catch {
+      toast.error("다운로드 URL을 가져오는데 실패했습니다");
+    }
   };
-
-  const filteredDocuments = useMemo(() => {
-    return documents.filter((doc) => {
-      // Category filter
-      if (categoryFilter !== "all" && doc.category !== categoryFilter) {
-        return false;
-      }
-
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        return (
-          doc.name.toLowerCase().includes(query) ||
-          doc.description?.toLowerCase().includes(query) ||
-          doc.controlId?.toLowerCase().includes(query)
-        );
-      }
-
-      return true;
-    });
-  }, [documents, searchQuery, categoryFilter]);
 
   const stats = useMemo(() => {
     const total = documents.length;
-    const byCategory = {
-      policy: documents.filter((d) => d.category === "policy").length,
-      evidence: documents.filter((d) => d.category === "evidence").length,
-      report: documents.filter((d) => d.category === "report").length,
-      other: documents.filter((d) => d.category === "other").length,
-    };
-    const totalSize = documents.reduce((acc, d) => acc + d.size, 0);
-    return { total, byCategory, totalSize };
+    const totalSize = documents.reduce((acc, d) => acc + (d.file_size || 0), 0);
+    return { total, totalSize };
   }, [documents]);
+
+  // Get unique control IDs for filtering
+  const controlIds = useMemo(() => {
+    const ids = new Set<string>();
+    documents.forEach((doc) => {
+      if (doc.control_id) {
+        ids.add(doc.control_id);
+      }
+    });
+    return Array.from(ids).sort();
+  }, [documents]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-destructive">문서를 불러오는데 실패했습니다</p>
+          <p className="text-sm text-muted-foreground">백엔드 서버가 실행 중인지 확인해주세요</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -295,29 +223,11 @@ export default function DocumentsPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    카테고리: {fileCategoryConfig[uploadCategory].label}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {(Object.keys(fileCategoryConfig) as FileCategory[])
-                    .filter((c) => c !== "all")
-                    .map((cat) => (
-                      <DropdownMenuItem
-                        key={cat}
-                        onClick={() => setUploadCategory(cat)}
-                        className="cursor-pointer"
-                      >
-                        {fileCategoryConfig[cat].label}
-                      </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button onClick={handleFileSelect}>
-                파일 업로드
+              <Button
+                onClick={handleFileSelect}
+                disabled={uploadMutation.isPending}
+              >
+                {uploadMutation.isPending ? "업로드 중..." : "파일 업로드"}
               </Button>
               <input
                 ref={fileInputRef}
@@ -337,68 +247,78 @@ export default function DocumentsPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="sm:w-80"
             />
-            <div className="flex gap-2 flex-wrap">
-              {(Object.keys(fileCategoryConfig) as FileCategory[]).map((cat) => (
+            {controlIds.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
                 <Button
-                  key={cat}
-                  variant={categoryFilter === cat ? "default" : "outline"}
+                  variant={controlFilter === "" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setCategoryFilter(cat)}
+                  onClick={() => setControlFilter("")}
                 >
-                  {fileCategoryConfig[cat].label}
-                  {cat !== "all" && (
-                    <span className="ml-1 text-xs opacity-70">
-                      ({cat === "policy" ? stats.byCategory.policy :
-                        cat === "evidence" ? stats.byCategory.evidence :
-                        cat === "report" ? stats.byCategory.report :
-                        stats.byCategory.other})
-                    </span>
-                  )}
+                  전체
                 </Button>
-              ))}
-            </div>
+                {controlIds.map((controlId) => (
+                  <Button
+                    key={controlId}
+                    variant={controlFilter === controlId ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setControlFilter(controlId)}
+                  >
+                    {controlId}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Results Count */}
           <p className="text-sm text-muted-foreground shrink-0">
-            {filteredDocuments.length}개 문서
+            {documents.length}개 문서
           </p>
 
           {/* Documents List */}
           <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="space-y-3 pb-4">
-              {filteredDocuments.map((doc) => (
-                <DocumentCard
-                  key={doc.id}
-                  file={doc}
-                  onDelete={handleDelete}
-                  onCategoryChange={handleCategoryChange}
-                />
-              ))}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <p className="text-muted-foreground">로딩 중...</p>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-4">
+                {documents.map((doc) => (
+                  <DocumentCard
+                    key={doc.id}
+                    file={doc}
+                    onDelete={handleDelete}
+                    onDownload={handleDownload}
+                    isDeleting={deleteMutation.isPending}
+                  />
+                ))}
 
-              {filteredDocuments.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <p className="text-muted-foreground">
-                    {documents.length === 0 ? "업로드된 문서가 없습니다" : "검색 결과가 없습니다"}
-                  </p>
-                  {documents.length === 0 ? (
-                    <Button variant="link" onClick={handleFileSelect}>
-                      첫 문서 업로드하기
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="link"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setCategoryFilter("all");
-                      }}
-                    >
-                      필터 초기화
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+                {documents.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <p className="text-muted-foreground">
+                      {searchQuery || controlFilter
+                        ? "검색 결과가 없습니다"
+                        : "업로드된 문서가 없습니다"}
+                    </p>
+                    {searchQuery || controlFilter ? (
+                      <Button
+                        variant="link"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setControlFilter("");
+                        }}
+                      >
+                        필터 초기화
+                      </Button>
+                    ) : (
+                      <Button variant="link" onClick={handleFileSelect}>
+                        첫 문서 업로드하기
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>

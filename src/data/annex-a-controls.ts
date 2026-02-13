@@ -8,6 +8,8 @@ export interface AnnexAControl {
   titleKo: string;
   description: string;
   descriptionKo: string;
+  tip?: string;
+  evidence?: string;
 }
 
 export interface ControlWithStatus extends AnnexAControl {
@@ -18,6 +20,12 @@ export interface ControlWithStatus extends AnnexAControl {
 }
 
 export const controlCategories = [
+  // ISO 27001 Main body clauses
+  { id: "4", name: "Context of the organization", nameKo: "조직의 상황", count: 1 },
+  { id: "5", name: "Leadership", nameKo: "리더십", count: 1 },
+  { id: "6", name: "Planning", nameKo: "기획", count: 1 },
+  { id: "7", name: "Support", nameKo: "지원", count: 2 },
+  // ISO 27001 Annex A controls
   { id: "A.5", name: "Organizational controls", nameKo: "조직적 통제", count: 37 },
   { id: "A.6", name: "People controls", nameKo: "인적 통제", count: 8 },
   { id: "A.7", name: "Physical controls", nameKo: "물리적 통제", count: 14 },
@@ -25,6 +33,69 @@ export const controlCategories = [
 ];
 
 export const annexAControls: AnnexAControl[] = [
+  // 4. Context of the organization
+  {
+    id: "4.1",
+    category: "4",
+    categoryKo: "조직의 상황",
+    title: "Understanding the organization and its context",
+    titleKo: "이해관계자 및 보안 요구사항 식별서",
+    description: "The organization shall determine external and internal issues that are relevant to its purpose and that affect its ability to achieve the intended outcome(s) of its information security management system.",
+    descriptionKo: "고객, 정부, 임직원, 주주가 우리 회사 보안에 대해 무엇을 요구하는지 정리한 표입니다.",
+    tip: "1. 표 만들기: 노션이나 엑셀에 아래 컬럼으로 표를 만듭니다.\n   - 구분: 고객 / 정부 / 임직원 / 주주\n   - 이해관계자: (예: B2B 고객사, KISA, 개인정보보호위원회, 직원 전체)\n   - 요구사항: (예: '서비스 중단 없는 안정성(SLA)', '개인정보보호법 준수', '연봉 정보 비밀 유지')\n   - 관련 문서: (예: 서비스 이용약관, 취업규칙)\n2. 내용 채우기: 위 예시를 참고하여 3~4줄 정도만 채워 넣습니다.\n3. 증적 저장: 작성된 표를 PDF로 내보내기 하여 저장 (4.1_이해관계자_요구사항.pdf)",
+    evidence: "이해관계자 요구사항 표 PDF",
+  },
+
+  // 5. Leadership
+  {
+    id: "5.2",
+    category: "5",
+    categoryKo: "리더십",
+    title: "Policy",
+    titleKo: "정보보호 정책서",
+    description: "Top management shall establish an information security policy that is appropriate to the purpose of the organization.",
+    descriptionKo: "회사의 정보보호 방침과 원칙을 문서화한 최상위 정책 문서입니다.",
+    tip: "1. 정책서 작성: 노션에 '정보보호 정책서' 페이지를 만들고 다음 내용을 포함합니다.\n   - 정보보호 목표 및 원칙\n   - 적용 범위 (전 임직원, 시스템 등)\n   - 경영진 의지 표명\n2. 네트워크 구성도 작성: AWS VPC 안에 Web Server, WAS, DB 등을 그리고, 전체를 감싸는 점선 박스에 'ISMS 인증 범위'라고 표시합니다.\n3. 증적 저장: 정책서 PDF 및 범위가 표시된 네트워크 구성도 이미지",
+    evidence: "정보보호 정책서 PDF, ISMS 인증 범위 네트워크 구성도",
+  },
+
+  // 6. Planning
+  {
+    id: "6.1",
+    category: "6",
+    categoryKo: "기획",
+    title: "Actions to address risks and opportunities",
+    titleKo: "정보보호 위험 평가표",
+    description: "When planning for the information security management system, the organization shall consider the issues and determine the risks and opportunities that need to be addressed.",
+    descriptionKo: "우리 회사의 자산(노트북, 서버)이 털렸을 때 얼마나 위험한지 점수(Risk Score)를 매기는 과정입니다.",
+    tip: "1. 엑셀 표 작성:\n   - 자산명: 대표이사 노트북 / AWS 운영 DB / 개발자 노트북\n   - 위협: 분실 / 해킹 / 파손\n   - 가능성(A): 1(낮음) ~ 3(높음)\n   - 피해규모(B): 1(낮음) ~ 3(높음)\n   - 위험도(A x B): 1 ~ 9점\n2. 평가: 예를 들어 'AWS 운영 DB'가 '해킹'당하면 피해가 크므로(3), 가능성이 낮아도(1) 위험도는 3점입니다.\n3. DOA 설정: '위험도 6점 이상은 무조건 조치한다'는 기준(수용 가능 위험 수준)을 정해둡니다.\n4. 증적 저장: 작성된 위험 평가 엑셀 파일",
+    evidence: "위험 평가표 엑셀 파일",
+  },
+
+  // 7. Support
+  {
+    id: "7.2",
+    category: "7",
+    categoryKo: "지원",
+    title: "Competence",
+    titleKo: "정보보호 자원 및 예산 할당 내역",
+    description: "The organization shall determine the necessary competence of person(s) doing work under its control that affects its information security performance.",
+    descriptionKo: "'보안 하라고 말만 하지 않고, 돈(예산)과 사람을 썼다'는 것을 증명합니다.",
+    tip: "1. 예산 내역 정리: 보안 관련 지출 내역을 정리합니다.\n   - 보안 소프트웨어 구매비 (백신, 방화벽 등)\n   - 보안 교육비\n   - 외부 컨설팅비\n2. 인력 현황: 보안 업무 담당 인원 및 역할을 문서화합니다.\n3. 증적 저장: 예산 집행 내역서, 조직도 또는 R&R 문서",
+    evidence: "보안 예산 집행 내역서, 보안 인력 R&R 문서",
+  },
+  {
+    id: "7.3",
+    category: "7",
+    categoryKo: "지원",
+    title: "Awareness",
+    titleKo: "정기 정보보호 교육 결과",
+    description: "Persons doing work under the organization's control shall be aware of the information security policy and their contribution to the effectiveness of the ISMS.",
+    descriptionKo: "전 직원이 1년에 1회 이상 보안 교육을 듣고, 퀴즈를 풀어 내용을 숙지했음을 증명합니다.",
+    tip: "1. 교육 실시: 개인정보보호포털 등의 무료 온라인 교육 링크를 슬랙에 배포하고 '이번 주까지 들으세요' 공지합니다.\n2. 퀴즈 및 서명: 구글 폼(Google Forms)을 만들어 배포합니다.\n   - 내용: 이름, 부서, 교육 이수 여부(O/X), 간단한 OX 퀴즈 5문제, 서명(이름 입력)\n3. 결과 보관: 구글 폼 응답 결과(스프레드시트)를 PDF로 변환하여 저장합니다. (누가 언제 냈는지 타임스탬프가 찍혀 있어야 함)\n4. 증적 저장: 연도_전사_보안교육_결과보고서.pdf",
+    evidence: "보안교육 결과보고서 PDF, 구글 폼 응답 스프레드시트",
+  },
+
   // A.5 Organizational controls (37)
   {
     id: "A.5.1",
@@ -103,9 +174,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.5",
     categoryKo: "조직적 통제",
     title: "Inventory of information and other associated assets",
-    titleKo: "정보 및 관련 자산 목록",
+    titleKo: "지급된 노트북/모니터 및 SW 대장 작성",
     description: "An inventory of information and other associated assets, including owners, shall be developed and maintained.",
-    descriptionKo: "소유자를 포함한 정보 및 관련 자산 목록을 개발하고 유지해야 한다.",
+    descriptionKo: "회사에 있는 노트북, 모니터, 소프트웨어, 서버가 총 몇 개이고 누가 쓰고 있는지 대장을 만드는 것입니다.",
+    tip: "1. 구글 스프레드시트 생성: 파일명을 '[대외비] 회사명_정보자산대장_v1.0'으로 만듭니다.\n2. 탭 나누기: 하단 탭을 '단말기', '소프트웨어', '시스템(서버)' 3개로 만듭니다.\n3. 단말기 탭 작성:\n   - 열: 관리번호(PC-01), 구분(노트북), 모델명(MacBook Pro 14), 시리얼번호, 사용자, 지급일, 반납일\n   - 사무실 내 모든 PC와 모니터를 적습니다.\n4. 소프트웨어 탭 작성:\n   - 열: SW명(Slack, Adobe, Notion), 라이선스 수량(13개), 만료일, 관리부서\n5. 시스템 탭 작성:\n   - 열: 호스트명(AWS EC2-Web01), 용도(웹서버), OS(Ubuntu 20.04), 책임자, 중요도(상)\n6. 증적 저장: 작성된 엑셀 파일을 다운로드하여 업로드.",
+    evidence: "정보자산대장 스프레드시트 파일 또는 스크린샷",
   },
   {
     id: "A.5.10",
@@ -157,9 +230,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.5",
     categoryKo: "조직적 통제",
     title: "Access control",
-    titleKo: "접근 통제",
+    titleKo: "최소 권한 부여 원칙 수립",
     description: "Rules to control physical and logical access to information and other associated assets shall be established and implemented based on business and information security requirements.",
-    descriptionKo: "비즈니스 및 정보보안 요구사항에 기반하여 정보 및 관련 자산에 대한 물리적, 논리적 접근을 통제하는 규칙을 수립하고 구현해야 한다.",
+    descriptionKo: "'누가 어떤 시스템에 들어갈 수 있는지' 기준을 정하는 것입니다. (아무나 관리자 주지 않기)",
+    tip: "1. 문서 작성: 노션에 '시스템 접근 권한 정의서' 표를 작성합니다.\n2. 표 내용 채우기:\n   - 일반 임직원: 슬랙(O), 노션(O), AWS(X), 인사데이터(X)\n   - 개발팀: 슬랙(O), 노션(O), AWS 개발망(O), AWS 운영망(제한적 허용)\n   - 인사담당자: 인사데이터(O), AWS(X)\n3. 원칙 명시: 표 아래에 '퇴사 시 모든 권한 즉시 회수, 부서 이동 시 기존 권한 재검토' 등의 원칙을 기재합니다.\n4. 전 직원 공지: 슬랙에 해당 문서를 공유하고 확인 이모지를 받습니다.",
+    evidence: "시스템 접근 권한 정의서, 슬랙 공지 캡처",
   },
   {
     id: "A.5.16",
@@ -229,9 +304,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.5",
     categoryKo: "조직적 통제",
     title: "Information security for use of cloud services",
-    titleKo: "클라우드 서비스 사용을 위한 정보보안",
+    titleKo: "사고 발생 시 연락망 및 조치 순서",
     description: "Processes for acquisition, use, management and exit from cloud services shall be established in accordance with the organization's information security requirements.",
-    descriptionKo: "클라우드 서비스의 획득, 사용, 관리 및 종료를 위한 프로세스를 조직의 정보보안 요구사항에 따라 수립해야 한다.",
+    descriptionKo: "해킹이나 바이러스 감염 시 '누구한테 연락하고 어떻게 할지' 비상 연락망을 만들어 두는 것입니다.",
+    tip: "1. 비상 연락망 작성: 노션에 '보안 사고 발생 시 연락망' 페이지를 만들고, 1차(보안담당자), 2차(CTO), 3차(대표) 연락처를 기재합니다.\n2. 조치 순서 정의: 사고 인지 → 보고 → 격리 → 조사 → 복구 → 재발방지 순서를 문서화합니다.\n3. 클라우드 보안 점검: AWS IAM MFA 활성화 여부, Security Group에서 0.0.0.0/0 전체 허용된 위험 포트(SSH 22, RDP 3389) 없는지 확인합니다.\n4. 증적 저장: IAM MFA 활성화 화면, Security Group 설정 화면 캡처.",
+    evidence: "비상 연락망 문서, 사고 대응 절차서, IAM MFA 설정 캡처, Security Group 설정 캡처",
   },
   {
     id: "A.5.24",
@@ -366,9 +443,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.6",
     categoryKo: "인적 통제",
     title: "Screening",
-    titleKo: "사전 심사",
+    titleKo: "신원 및 경력 검증 절차",
     description: "Background verification checks on all candidates to become personnel shall be carried out prior to joining the organization and on an ongoing basis taking into consideration applicable laws, regulations and ethics and be proportional to the business requirements, the classification of the information to be accessed and the perceived risks.",
-    descriptionKo: "인원이 되고자 하는 모든 후보자에 대한 배경 확인 검사를 조직 입사 전 및 지속적으로 적용 가능한 법률, 규정, 윤리를 고려하고 비즈니스 요구사항, 접근할 정보의 분류 및 인지된 위험에 비례하여 수행해야 한다.",
+    descriptionKo: "입사자가 제출한 스펙(학력, 경력)이 거짓이 아님을 회사가 확인했다는 증거를 남기는 절차입니다.",
+    tip: "1. 제출 요청: 인사 담당자가 입사 예정자에게 메일을 보냅니다. '입사일 전까지 주민등록등본(뒷자리 마스킹), 최종학력증명서, (경력직) 경력증명서를 PDF로 제출해 주세요.'\n2. 대조 확인: 제출된 증명서 내용이 이력서와 일치하는지 눈으로 확인합니다.\n3. 폴더 저장: 인사 담당자 PC 내 [보안] 입사자_제출서류 폴더에 '2024_홍길동_증빙서류.zip' 형태로 저장합니다.\n4. 증적 저장: 해당 폴더의 파일 목록 스크린샷 (파일명만 보이게).",
+    evidence: "입사자 제출서류 폴더 파일 목록 스크린샷, 증명서 대조 확인 기록",
   },
   {
     id: "A.6.2",
@@ -402,9 +481,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.6",
     categoryKo: "인적 통제",
     title: "Responsibilities after termination or change of employment",
-    titleKo: "고용 종료 또는 변경 후 책임",
+    titleKo: "퇴사자 계정 비활성화 및 권한 회수",
     description: "Information security responsibilities and duties that remain valid after termination or change of employment shall be defined, enforced and communicated to relevant personnel and other interested parties.",
-    descriptionKo: "고용 종료 또는 변경 후에도 유효한 정보보안 책임과 의무를 정의하고 시행하며 관련 인원 및 기타 이해관계자에게 전달해야 한다.",
+    descriptionKo: "퇴사자의 모든 시스템 계정을 즉시 비활성화하고 접근 권한을 회수하는 절차입니다.",
+    tip: "1. 퇴사자 체크리스트 작성: 퇴사 시 비활성화할 계정 목록(슬랙, 노션, AWS, 구글 워크스페이스 등)을 정리합니다.\n2. 즉시 비활성화: 퇴사일 당일에 모든 계정을 비활성화하고, 공유 폴더 접근 권한을 제거합니다.\n3. 확인 기록: 각 시스템에서 계정이 비활성화되었음을 보여주는 스크린샷을 캡처합니다.",
+    evidence: "퇴사자 계정 비활성화 체크리스트, 각 시스템별 Deactivated Account 목록 캡처",
   },
   {
     id: "A.6.6",
@@ -420,9 +501,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.6",
     categoryKo: "인적 통제",
     title: "Remote working",
-    titleKo: "원격 근무",
+    titleKo: "원격/재택근무 보안 가이드",
     description: "Security measures shall be implemented when personnel are working remotely to protect information accessed, processed or stored outside the organization's premises.",
-    descriptionKo: "인원이 원격으로 근무할 때 조직 구내 외부에서 접근, 처리 또는 저장되는 정보를 보호하기 위한 보안 조치를 구현해야 한다.",
+    descriptionKo: "사무실 밖(재택, 카페)에서 일할 때 지켜야 할 최소한의 보안 수칙을 정하고 전파하는 것입니다.",
+    tip: "1. 가이드 작성: 노션에 '[필독] 원격/재택근무 보안 가이드' 페이지를 만듭니다.\n   - 네트워크: 카페 등 공공장소의 개방형 Wi-Fi 사용 절대 금지 (개인 핫스팟 사용 권장)\n   - 화면 보호: 공공장소 작업 시 타인에게 화면이 노출되지 않도록 주의 (벽을 등지고 앉기)\n   - 기기 관리: 잠시라도 자리를 비울 땐 반드시 노트북 잠금(Win+L / Cmd+Ctrl+Q)\n2. 공지 및 서명: 슬랙에 링크를 공유하고 '전 직원: 확인함' 이모지나 댓글을 받습니다.\n3. 증적 저장: 가이드 내용이 보이는 노션 화면 + 직원들 반응이 달린 슬랙 화면 캡처.",
+    evidence: "원격근무 보안 가이드 노션 스크린샷, 슬랙 공지 및 직원 확인 반응 캡처",
   },
   {
     id: "A.6.8",
@@ -494,9 +577,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.7",
     categoryKo: "물리적 통제",
     title: "Clear desk and clear screen",
-    titleKo: "클린 데스크 및 클린 스크린",
+    titleKo: "업무 환경 보안 및 화면 보호 정책",
     description: "Clear desk rules for papers and removable storage media and clear screen rules for information processing facilities shall be defined and appropriately enforced.",
-    descriptionKo: "종이 및 이동식 저장 매체에 대한 클린 데스크 규칙과 정보 처리 시설에 대한 클린 스크린 규칙을 정의하고 적절히 시행해야 한다.",
+    descriptionKo: "자리를 비울 때 책상 위에 중요 서류(비밀번호 적힌 포스트잇 등)를 방치하지 않고, 모니터 화면을 반드시 잠그는 것입니다.",
+    tip: "1. 화면 보호기 설정 공지: 슬랙에 '모든 임직원은 PC 화면 보호기(절전 모드) 대기 시간을 10분 이내로 설정해 주세요. 절전 모드 해제 시 로그인 암호 입력 기능을 반드시 켜주세요.' 공지합니다.\n2. 클리어 데스크 점검: 점심시간 등에 불시에 사무실을 한 바퀴 돌며 모니터 주변 비밀번호 포스트잇, 책상 위 중요 서류 방치 여부를 확인합니다.\n3. 증적 저장: 전 직원의 화면 보호기 설정 스크린샷을 수집합니다.",
+    evidence: "화면 보호기 설정 스크린샷, 클리어 데스크 점검 기록, 공지 슬랙 캡처",
   },
   {
     id: "A.7.8",
@@ -568,9 +653,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.8",
     categoryKo: "기술적 통제",
     title: "User end point devices",
-    titleKo: "사용자 엔드포인트 장치",
+    titleKo: "백신 설치 및 OS 최신화 점검",
     description: "Information stored on, processed by or accessible via user end point devices shall be protected.",
-    descriptionKo: "사용자 엔드포인트 장치에 저장, 처리되거나 접근 가능한 정보를 보호해야 한다.",
+    descriptionKo: "직원들이 쓰는 노트북이 바이러스에 감염되지 않도록 최소한의 방어막(백신, 업데이트)을 치고 있는지 확인합니다.",
+    tip: "1. 보안 가이드 배포: 슬랙이나 노션에 '백신 설치 방법 + OS 업데이트 방법' 가이드를 공유하세요.\n2. 현황 파악: 구글 설문지 등으로 '현재 백신 설치 여부, 설치 제품명, 마지막 업데이트 날짜'를 조사하세요.\n3. 증적 저장: 백신 설치 화면 캡처나 설문 응답 결과를 이 태스크에 업로드하면 끝입니다.",
+    evidence: "백신 설치 화면 캡처, OS 버전 정보 스크린샷, 설문 응답 결과",
   },
   {
     id: "A.8.2",
@@ -667,9 +754,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.8",
     categoryKo: "기술적 통제",
     title: "Data leakage prevention",
-    titleKo: "데이터 유출 방지",
+    titleKo: "외부 공유 및 데이터 유출 통제",
     description: "Data leakage prevention measures shall be applied to systems, networks and any other devices that process, store or transmit sensitive information.",
-    descriptionKo: "민감한 정보를 처리, 저장 또는 전송하는 시스템, 네트워크 및 기타 장치에 데이터 유출 방지 조치를 적용해야 한다.",
+    descriptionKo: "구글 드라이브나 슬랙을 통해 회사 내부 자료가 외부로 함부로 나가지 못하도록 기술적으로 막거나 경고를 띄웁니다.",
+    tip: "1. 구글 워크스페이스 관리 콘솔에서 '링크가 있는 모든 사용자' 공유 옵션을 비활성화하세요.\n2. 슬랙에서 외부 멤버 초대 시 관리자 승인 필수 옵션을 켜세요.\n3. '외부 공유 요청은 #security-request 채널로'라는 규칙을 공지하세요.",
+    evidence: "구글 워크스페이스 공유 설정 스크린샷, 슬랙 관리 설정 스크린샷, 외부 공유 요청 채널 캡처",
   },
   {
     id: "A.8.13",
@@ -694,9 +783,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.8",
     categoryKo: "기술적 통제",
     title: "Logging",
-    titleKo: "로깅",
+    titleKo: "시스템 로그 기록 및 보존 정책",
     description: "Logs that record activities, exceptions, faults and other relevant events shall be produced, stored, protected and analysed.",
-    descriptionKo: "활동, 예외, 장애 및 기타 관련 이벤트를 기록하는 로그를 생성, 저장, 보호 및 분석해야 한다.",
+    descriptionKo: "해킹 사고가 났을 때 '누가, 언제, 무엇을 했는지' 추적할 수 있도록 서버와 애플리케이션의 접속 기록을 남기고 최소 3개월 이상 보관합니다.",
+    tip: "1. AWS CloudTrail이 켜져 있는지 확인하고, 로그 보존 기간을 90일 이상으로 설정하세요.\n2. 애플리케이션 로그(예: 로그인 기록, API 호출 기록)가 저장되고 있는지 확인하세요.\n3. 로그 백업 정책을 문서화하고, S3 버킷에 저장되는 로그의 접근 권한을 제한하세요.",
+    evidence: "AWS CloudTrail 설정 스크린샷, 로그 보존 정책 문서, S3 버킷 로그 저장 설정 캡처",
   },
   {
     id: "A.8.16",
@@ -811,9 +902,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.8",
     categoryKo: "기술적 통제",
     title: "Secure coding",
-    titleKo: "시큐어 코딩",
+    titleKo: "보안 코딩 가이드 준수 및 코드 리뷰",
     description: "Secure coding principles shall be applied to software development.",
-    descriptionKo: "소프트웨어 개발에 시큐어 코딩 원칙을 적용해야 한다.",
+    descriptionKo: "개발 단계에서 SQL Injection, XSS 같은 보안 취약점이 들어가지 않도록 검사하고 배포합니다.",
+    tip: "1. GitHub에서 Branch Protection Rule을 설정해 최소 1명 이상의 코드 리뷰를 필수로 만드세요.\n2. 데이터베이스에 민감 정보(비밀번호, 개인정보 등)를 암호화하여 저장하고 있는지 확인하세요.\n3. OWASP Top 10 기준으로 SQL Injection, XSS 등 취약점 체크리스트를 만들어 코드 리뷰 시 활용하세요.",
+    evidence: "GitHub Branch Protection 설정 스크린샷, 코드 리뷰 PR 캡처, DB 암호화 설정 증빙, 보안 체크리스트 문서",
   },
   {
     id: "A.8.29",
@@ -838,9 +931,11 @@ export const annexAControls: AnnexAControl[] = [
     category: "A.8",
     categoryKo: "기술적 통제",
     title: "Separation of development, test and production environments",
-    titleKo: "개발, 테스트 및 운영 환경 분리",
+    titleKo: "테스트 데이터 가명화 및 분리",
     description: "Development, testing and production environments shall be separated and secured.",
-    descriptionKo: "개발, 테스트 및 운영 환경을 분리하고 보안해야 한다.",
+    descriptionKo: "운영 서버의 실제 고객 개인정보를 테스트 서버에 그대로 붓지 않는다는 것을 증명해야 합니다.",
+    tip: "1. 테스트/개발 환경에서는 Faker.js 같은 라이브러리로 가짜 데이터를 생성해서 사용하세요.\n2. 운영 데이터를 테스트에 사용해야 한다면, 이름·연락처·이메일 등을 마스킹 처리하는 가명화 스크립트를 적용하세요.\n3. 개발/테스트/운영 환경이 물리적 또는 논리적으로 분리되어 있음을 문서화하세요.",
+    evidence: "테스트 데이터 생성 스크립트 또는 Faker 사용 코드, 가명화 처리 스크립트, 환경 분리 구성도",
   },
   {
     id: "A.8.32",
